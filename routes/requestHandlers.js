@@ -16,7 +16,6 @@ function logClient(req) {
   let absolutePath = path.join(os.homedir(), filename);
   
   appendToFile(absolutePath, logMsg);
-
 }
 
 function processPostRequest(req, res) {
@@ -38,7 +37,5 @@ function processPostRequest(req, res) {
 
   appendToFile(absolutePath, bodyString);
 }
-
-
 
 module.exports = { logClient, processPostRequest };
