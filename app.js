@@ -1,7 +1,9 @@
 const express = require('express');
-const { logClient, processPostRequest } = require('./routes/requestHandlers.js');
+const { saveWeatherData } = require('./routes/requestHandlers.js');
+const { logClient } = require('./logger/logger.js');
 const { getLatestWeatherRows, insertWeatherData } = require('./db/db.js');
 const path = require('path');
+const cors = require('cors');
 
 const app = express();
 const PORT = 3000;
@@ -9,6 +11,7 @@ const PORT = 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../pouta-frontend/dynahtml')));
+app.use(cors());
 
 app.post('/', (req, res) => {
   logClient(req);
@@ -30,7 +33,7 @@ app.get('/api/get/', async (req, res) => {
 app.post('/api/post/', async (req, res) => {
   logClient(req);
   console.log(req.body);
-  processPostRequest(req, res);
+  saveWeatherData(req, res);
   try {
     await insertWeatherData(req.body);
     res.status(200).send('Data inserted successfully');
