@@ -10,8 +10,15 @@ const PORT = 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, '../pouta-frontend/dynahtml')));
+app.use('/static', express.static(path.join(__dirname, '../pouta-frontend/dynahtml/static')));
 app.use(cors());
+
+app.set('trust proxy', 'loopback');
+
+app.get('/', (req, res) => {
+  logClient(req);
+  res.sendFile(path.join(__dirname, '../pouta-frontend/dynahtml/index.html'));
+});
 
 app.post('/', (req, res) => {
   logClient(req);
@@ -41,11 +48,6 @@ app.post('/api/post/', async (req, res) => {
     res.status(500).send('Server error');
     console.error(err);
     }
-});
-
-app.get('/', (req, res) => {
-  logClient(req);
-  res.sendFile(path.join(__dirname, '../pouta-frontend/dynahtml/index.html'));
 });
 
 app.listen(PORT, () => {

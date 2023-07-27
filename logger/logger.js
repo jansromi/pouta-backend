@@ -4,11 +4,18 @@ const os = require('os');
 const { generateTimestamp } = require('../libs/date.js');
 
 function logClient(req) {
-  let logMsg = `Received request from ${req.ip}\n`;
+  let ip = (req.headers['x-forwarded-for'] || '').split(',').pop().trim() ||
+  req.connection.remoteAddress ||
+  req.socket.remoteAddress ||
+  req.connection.socket.remoteAddress ||
+  req.headers['x-real-ip'] || req.headers['X-Real-IP'] ||
+  req.headers['x-forwarded-for'] || req.headers['X-Forwarded-For'];
+  let logMsg = `Received request from ${ip}\n`;
   let date = new Date();
   timestamp = generateTimestamp(date);
-  logMsg += `Time of request: ${timestamp}\n`;
-
+  logMsg += `Time of request: ${timestamp}\n`; 
+  logMsg += `Connection route: ${JSON.stringify(req.route, null, 2)}\n`;
+  logMsg += `TLS: ${req.secure}\n`;
   let filename = `pouta-logs/pouta-clientlogs/pouta-client-log-${timestamp}.txt`;
   
   // Convert the filename to absolute path
