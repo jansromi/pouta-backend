@@ -1,6 +1,6 @@
 const express = require('express');
 const { saveWeatherData } = require('./routes/requestHandlers.js');
-const { logClient } = require('./logger/logger.js');
+const { logClient, logPost } = require('./logger/logger.js');
 const { getLatestWeatherRows, insertWeatherData } = require('./db/db.js');
 const path = require('path');
 const cors = require('cors');
@@ -38,7 +38,7 @@ app.get('/api/get/', async (req, res) => {
 });
 
 app.post('/api/post/', async (req, res) => {
-  logClient(req);
+  logPost(req);
   console.log(req.body);
   saveWeatherData(req, res);
   try {

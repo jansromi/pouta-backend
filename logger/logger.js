@@ -4,12 +4,7 @@ const os = require('os');
 const { generateTimestamp } = require('../libs/date.js');
 
 function logClient(req) {
-  let ip = (req.headers['x-forwarded-for'] || '').split(',').pop().trim() ||
-  req.connection.remoteAddress ||
-  req.socket.remoteAddress ||
-  req.connection.socket.remoteAddress ||
-  req.headers['x-real-ip'] || req.headers['X-Real-IP'] ||
-  req.headers['x-forwarded-for'] || req.headers['X-Forwarded-For'];
+  let ip = getRealIpAddress(req);
   let logMsg = `Received request from ${ip}\n`;
   let date = new Date();
   timestamp = generateTimestamp(date);
@@ -24,8 +19,13 @@ function logClient(req) {
   appendToFile(absolutePath, logMsg);
 }
 
-function logEvent() {
-
+function logPost(req) { 
+  let ip = getRealIpAddress(req);
+  let logMsg = `Recieved post request from ${ip}\n`;
+  let date = new Date();
+  timestamp = generateTimestamp(date);
+  logMsg += `Time of request: ${timestamp}\n`;
+  logMsg += `Post body content: ${req.body}`;
 }
 
 async function appendToFile(fileName, data) {
@@ -36,6 +36,18 @@ async function appendToFile(fileName, data) {
     console.error(`Error appending to file: ${err}`);
     throw err;
   }
-} 
+}
 
-module.exports = { appendToFile, logClient };
+function getRealIpAddress(req){
+    return (
+        (req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'].split(',').pop().trim() : null) ||
+        req.connection.remoteAddress ||
+        req.socket.remoteAddress ||
+        (req.connection.socket ? req.connection.socket.remoteAddress : null) ||
+        req.headers['x-real-ip'] || req.headers['X-Real-IP'] ||
+        req.headers['x-forwarded-for'] || req.headers['X-Forwarded-For']
+    );
+}
+
+
+module.exports = { appendToFile, logClient, logPost };
