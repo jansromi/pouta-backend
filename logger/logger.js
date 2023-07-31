@@ -25,7 +25,10 @@ function logPost(req) {
   let date = new Date();
   timestamp = generateTimestamp(date);
   logMsg += `Time of request: ${timestamp}\n`;
-  logMsg += `Post body content: ${req.body}`;
+  logMsg += `Post body content: ${JSON.stringify(req.body)}`;
+  let filename = `pouta-logs/pouta-clientlogs/pouta-post-log-${timestamp}.txt`;
+  let absolutePath = path.join(os.homedir(), filename);
+  appendToFile(absolutePath, logMsg);
 }
 
 async function appendToFile(fileName, data) {
